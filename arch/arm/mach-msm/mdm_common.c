@@ -1101,6 +1101,8 @@ static int mdm_configure_ipc(struct mdm_device *mdev)
 		ret = PTR_ERR(mdev->mdm_subsys_dev);
 		goto fatal_err;
 	}
+	subsys_default_online(mdm_subsys_dev);
+
 	memset((void *)&mdev->ssr_notifier_blk, 0,
 			sizeof(struct notifier_block));
 	mdev->ssr_notifier_blk.notifier_call  = ssr_notifier_cb;

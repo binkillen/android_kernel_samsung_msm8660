@@ -418,6 +418,7 @@ static int __init charm_modem_probe(struct platform_device *pdev)
 		ret = PTR_ERR(charm_subsys);
 		goto fatal_err;
 	}
+	subsys_default_online(charm_subsys);
 
 #ifdef CHARM_MDM2AP_WAKEUP
 	gpio_request(MDM2AP_WAKEUP, "MDM2AP_WAKEUP");

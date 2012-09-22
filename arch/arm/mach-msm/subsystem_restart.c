@@ -210,6 +210,20 @@ static void subsys_set_state(struct subsys_device *subsys,
 	spin_unlock_irqrestore(&subsys->restart_lock, flags);
 }
 
+/**
+ * subsytem_default_online() - Mark a subsystem as online by default
+ * @dev: subsystem to mark as online
+ *
+ * Marks a subsystem as "online" without increasing the reference count
+ * on the subsystem. This is typically used by subsystems that are already
+ * online when the kernel boots up.
+ */
+void subsys_default_online(struct subsys_device *dev)
+{
+	subsys_set_state(dev, SUBSYS_ONLINE);
+}
+EXPORT_SYMBOL(subsys_default_online);
+
 static struct subsys_soc_restart_order *
 update_restart_order(struct subsys_device *dev)
 {
