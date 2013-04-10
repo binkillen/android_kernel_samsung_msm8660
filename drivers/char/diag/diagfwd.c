@@ -56,6 +56,17 @@ struct diag_hdlc_dest_type enc = { NULL, NULL, 0 };
 int wrap_enabled;
 uint16_t wrap_count;
 
+#if defined(CONFIG_KOR_MODEL_SHV_E160L) || defined(CONFIG_KOR_MODEL_SHV_E120L)
+static int diagfwd_delay_done = 0;
+static void diagfwd_delay_work_fn(struct work_struct *work);
+DECLARE_DELAYED_WORK(diagfwd_delay_work, diagfwd_delay_work_fn);
+static void diagfwd_delay_work_fn(struct work_struct *work)
+{
+	diagfwd_delay_done = 1;
+	diagfwd_connect();
+}
+#endif
+
 void encode_rsp_and_send(int buf_length)
 {
 	struct diag_smd_info *data = &(driver->smd_data[MODEM_DATA]);
@@ -1481,8 +1492,15 @@ void diag_usb_legacy_notifier(void *priv, unsigned event,
 {
 	switch (event) {
 	case USB_DIAG_CONNECT:
+#if defined(CONFIG_KOR_MODEL_SHV_E160L) || defined(CONFIG_KOR_MODEL_SHV_E120L)
+		if (diagfwd_delay_done)
+			diagfwd_connect();
+		else
+			schedule_delayed_work(&diagfwd_delay_work, msecs_to_jiffies(15000));
+#else
 		queue_work(driver->diag_wq,
 			 &driver->diag_usb_connect_work);
+#endif
 		break;
 	case USB_DIAG_DISCONNECT:
 		queue_work(driver->diag_wq,

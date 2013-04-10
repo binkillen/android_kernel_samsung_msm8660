@@ -615,7 +615,9 @@ int hibernate(void)
 	if (error)
 		goto Exit;
 
+#ifndef CONFIG_USA_MODEL_SGH_T989
 	printk(KERN_INFO "PM: Syncing filesystems ... ");
+#endif
 	sys_sync();
 	printk("done.\n");
 

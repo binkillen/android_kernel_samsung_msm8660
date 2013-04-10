@@ -685,6 +685,19 @@ static int __init vfp_init(void)
 #ifdef CONFIG_PROC_FS
 	static struct proc_dir_entry *procfs_entry;
 #endif
+
+#ifdef CONFIG_USA_MODEL_SGH_I757
+	struct cpumask cpus_curr, cpus;
+	sched_getaffinity(current->pid,&cpus_curr);
+	cpumask_clear(&cpus);
+	cpumask_set_cpu(smp_processor_id(), &cpus);
+	if (sched_setaffinity(current->pid, &cpus))
+		pr_err("%s: vfp_init set CPU affinity failed Proceeding on Risk\n",
+				__func__);
+	else
+		pr_err("%s : affinity set to CPU %d\n",__func__,smp_processor_id());
+#endif
+
 	if (cpu_arch >= CPU_ARCH_ARMv6)
 		on_each_cpu(vfp_enable, NULL, 1);
 
@@ -761,6 +774,14 @@ static int __init vfp_init(void)
 		procfs_entry->read_proc = proc_read_status;
 	else
 		pr_err("Failed to create procfs node for VFP bounce reporting\n");
+#endif
+
+#ifdef CONFIG_USA_MODEL_SGH_I757
+	if (sched_setaffinity(current->pid, &cpus_curr))
+		pr_err("%s: vfp_init restore CPU affinity failed Proceeding on Risk\n",
+			__func__);
+	else
+		pr_err("%s : affinity restored to %x\n",__func__,*((int *)(cpus_curr.bits)));
 #endif
 
 	return 0;

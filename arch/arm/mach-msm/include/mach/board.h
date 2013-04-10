@@ -217,13 +217,18 @@ enum msm_camera_vreg_name_t {
 
 struct msm_camera_sensor_platform_info {
 	int mount_angle;
+	int sensor_reset_enable;	
 	int sensor_reset;
+	int sensor_pwd;
+	int vcm_pwd;
+	int vcm_enable;	
 	struct camera_vreg_t *cam_vreg;
 	int num_vreg;
 	int32_t (*ext_power_ctrl) (int enable);
 	struct msm_camera_gpio_conf *gpio_conf;
 	struct msm_camera_i2c_conf *i2c_conf;
 	struct msm_camera_csi_lane_params *csi_lane_params;
+	int(*sensor_power_control) (int);
 };
 
 enum msm_camera_actuator_name {
@@ -269,6 +274,7 @@ struct msm_camera_sensor_info {
 	uint8_t num_resources;
 	struct msm_camera_sensor_flash_data *flash_data;
 	int csi_if;
+	uint32_t irq;
 	struct msm_camera_sensor_strobe_flash_data *strobe_flash_data;
 	char *eeprom_data;
 	enum msm_camera_type camera_type;
@@ -494,6 +500,7 @@ struct msm_hdmi_platform_data {
 	bool (*check_hdcp_hw_support)(void);
 	bool (*source)(void);
 	bool is_mhl_enabled;
+	int bootup_ck;
 };
 
 struct msm_mhl_platform_data {
@@ -522,6 +529,8 @@ struct msm_i2c_platform_data {
 	int pri_dat;
 	int aux_clk;
 	int aux_dat;
+	const char *clk;
+	const char *pclk;
 	int src_clk_rate;
 	int use_gsbi_shared_mode;
 	int keep_ahb_clk_on;

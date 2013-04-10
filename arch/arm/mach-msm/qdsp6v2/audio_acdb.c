@@ -848,6 +848,7 @@ err:
 	mutex_unlock(&acdb_data.acdb_mutex);
 	return result;
 }
+
 static long acdb_ioctl(struct file *f,
 		unsigned int cmd, unsigned long arg)
 {

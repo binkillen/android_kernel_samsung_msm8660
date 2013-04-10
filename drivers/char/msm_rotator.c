@@ -3078,6 +3078,7 @@ static int __devexit msm_rotator_remove(struct platform_device *plat_dev)
 static int msm_rotator_suspend(struct platform_device *dev, pm_message_t state)
 {
 	rot_wait_for_commit_queue(true);
+
 	mutex_lock(&msm_rotator_dev->imem_lock);
 	if (msm_rotator_dev->imem_clk_state == CLK_EN
 		&& msm_rotator_dev->imem_clk) {
