@@ -2192,6 +2192,7 @@ static int __devinit ld9040_probe(struct platform_device *pdev)
 
 	if (pdev->id == 0) {
 		lcdc_ld9040_pdata = pdev->dev.platform_data;
+		spi_init();
 //		return 0;
 	}
 
