@@ -219,7 +219,6 @@ struct msm_fb_data_type {
 	void *copy_splash_buf;
 	unsigned char *copy_splash_phys;
 	uint32 sec_mapped;
-	uint32 max_map_size;
 };
 struct msm_fb_backup_type {
 	struct fb_info info;
