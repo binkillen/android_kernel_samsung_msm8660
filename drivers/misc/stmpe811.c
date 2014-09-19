@@ -5,6 +5,7 @@
 #include <linux/platform_device.h>
 #include <linux/module.h>
 #include <linux/device.h>
+#include <linux/module.h>
 #include <linux/miscdevice.h>
 #include <linux/vmalloc.h>
 #include <linux/fs.h>

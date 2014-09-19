@@ -17,17 +17,11 @@ obj-$(CONFIG_SENSORS_YDA165)	+= yda165_integ.o
 else
 obj-$(CONFIG_SENSORS_YDA165)    += yda165.o
 endif
-
 obj-$(CONFIG_SENSORS_CORE)		+= sensors_core.o
-
 obj-$(CONFIG_OPTICAL_GP2A)		+= gp2a_proximity.o gp2a_light.o gp2a_proc.o
-obj-$(CONFIG_OPTICAL_GP2AP020A00F)		+= gp2ap020_proximity.o gp2ap020_light.o
-
-obj-$(CONFIG_USB_SWITCH_FSA9480)	+= fsa9480.o
-
+obj-$(CONFIG_OPTICAL_GP2AP020A00F)	+= gp2ap020_proximity.o gp2ap020_light.o
 obj-$(CONFIG_OPTICAL_TAOS)		+= taos.o
-obj-$(CONFIG_GYRO_K3G)		+= k3g.o
-
+obj-$(CONFIG_GYRO_K3G)			+= k3g.o
 obj-$(CONFIG_SENSORS_K3DH)		+= orientation.o
 
 ifeq ($(CONFIG_I2C_DEBUG_CHIP),y)

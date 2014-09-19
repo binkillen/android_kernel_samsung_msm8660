@@ -7,6 +7,7 @@ ver 0.1 : only preview (base on universal)
 ****************************************************************/
 
 #include <linux/delay.h>
+#include <linux/module.h>
 #include <linux/types.h>
 #include <linux/i2c.h>
 #include <linux/uaccess.h>

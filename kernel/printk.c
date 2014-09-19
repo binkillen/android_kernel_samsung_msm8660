@@ -350,7 +350,7 @@ static int __init printk_remap_nocache(void)
 		sec_log_save_old();
 	}
 
-	spin_lock_irqsave(&logbuf_lock, flags);
+	raw_spin_lock_irqsave(&logbuf_lock, flags);
 
 	start = min(con_start, log_start);
 	while (start != log_end) {
@@ -358,7 +358,7 @@ static int __init printk_remap_nocache(void)
 				  [start++ & (__LOG_BUF_LEN - 1)]);
 	}
 
-	spin_unlock_irqrestore(&logbuf_lock, flags);
+	raw_spin_unlock_irqrestore(&logbuf_lock, flags);
 
 	sec_getlog_supply_kloginfo(log_buf);
 	

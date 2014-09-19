@@ -457,7 +457,7 @@ static ssize_t show_cpu_normalized_load(struct kobject *kobj,
 
 static struct kobj_attribute cpu_normalized_load_attr =
 	__ATTR(cpu_normalized_load, S_IWUSR | S_IRUSR, show_cpu_normalized_load,
-			NULL);
+			store_cpu_normalized_load);
 
 static struct attribute *rq_attrs[] = {
 	&cpu_normalized_load_attr.attr,

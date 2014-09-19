@@ -6,13 +6,6 @@
 
 menu "Miscellaneous I2C Chip support"
 
-config SENSORS_MT9T013
-	tristate "MT9T013 Camera Driver"
-	depends on I2C
-	default n
-	help
-	 MT9T013 Camera Driver implemented by HTC.
-
 config SENSORS_CORE
 	bool "Sensor devices"
 	help
@@ -56,13 +49,6 @@ config WM8994_AMP
         default y
         help
          WM8994 Audio AMP
-
-config USB_SWITCH_FSA9480
-	tristate "FSA9480 Micro USB Switch IC Driver"
-	depends on I2C
-	default n
-	help
-	 FSA9480 Micro USB Switch IC Driver
 
 config GYRO_K3G
 	tristate "K3G driver for s5pc210"

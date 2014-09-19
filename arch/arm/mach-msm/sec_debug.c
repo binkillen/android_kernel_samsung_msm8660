@@ -5,6 +5,7 @@
 
 #include <linux/errno.h>
 #include <linux/ctype.h>
+#include <linux/module.h>
 #include <linux/notifier.h>
 #include <linux/reboot.h>
 #include <linux/input.h>
@@ -24,6 +25,7 @@
 #include <linux/sec_param.h>
 
 #include <mach/system.h>
+#include <mach/restart.h>
 #include <mach/sec_debug.h>
 #include <mach/msm_iomap.h>
 #include <linux/seq_file.h>
@@ -578,7 +580,7 @@ void sec_debug_hw_reset(void)
 
 	outer_flush_all();
 
-	arch_reset(0, "sec_debug_hw_reset");
+	msm_restart(0, "sec_debug_hw_reset");
 
 	while (1) ;
 }
@@ -602,7 +604,7 @@ static int sec_debug_panic_handler(struct notifier_block *nb,
 
 			flush_cache_all();
 			outer_flush_all();
-			arch_reset(0, "sec_debug_comm_dump");
+			msm_restart(0, "sec_debug_comm_dump");
 
 			while (1) ;
 		}

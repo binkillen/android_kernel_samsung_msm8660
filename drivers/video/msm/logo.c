@@ -103,7 +103,7 @@ static void s3cfb_stop_progress(void);
 static void progress_timer_handler(unsigned long data);
 
 static int show_progress = 1;
-module_param_named(progress, show_progress, bool, 0);
+module_param_named(progress, show_progress, bint, 0);
 extern unsigned int is_lpcharging_state(void);
 #endif
 

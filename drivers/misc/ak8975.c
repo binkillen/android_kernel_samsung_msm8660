@@ -18,6 +18,7 @@
  */
 
 #include <linux/i2c.h>
+#include <linux/module.h>
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 #include <linux/slab.h>

@@ -67,30 +67,43 @@
 #define MSM_GSBI11_QUP_I2C_BUS_ID	18
 #endif 
 
+#ifdef CONFIG_SND_SOC_MSM8660_APQ
+extern struct platform_device msm_pcm;
+extern struct platform_device msm_pcm_routing;
+extern struct platform_device msm_cpudai0;
+extern struct platform_device msm_cpudai1;
+extern struct platform_device msm_cpudai_hdmi_rx;
+extern struct platform_device msm_cpudai_bt_rx;
+extern struct platform_device msm_cpudai_bt_tx;
+extern struct platform_device msm_cpudai_fm_rx;
+extern struct platform_device msm_cpudai_fm_tx;
+extern struct platform_device msm_cpu_fe;
+extern struct platform_device msm_stub_codec;
+extern struct platform_device msm_voice;
+extern struct platform_device msm_voip;
+extern struct platform_device msm_lpa_pcm;
+extern struct platform_device msm_pcm_hostless;
+#endif
+
 #ifdef CONFIG_SPI_QUP
 extern struct platform_device msm_gsbi1_qup_spi_device;
 extern struct platform_device msm_gsbi10_qup_spi_device;
 #endif
 
-#ifdef CONFIG_MSM_BUS_SCALING
 extern struct platform_device msm_bus_apps_fabric;
 extern struct platform_device msm_bus_sys_fabric;
 extern struct platform_device msm_bus_mm_fabric;
 extern struct platform_device msm_bus_sys_fpb;
 extern struct platform_device msm_bus_cpss_fpb;
-#endif
+extern struct platform_device msm_bus_def_fab;
 
 extern struct platform_device msm_device_smd;
-extern struct platform_device msm_kgsl_3d0;
-#ifdef CONFIG_MSM_KGSL_2D
-extern struct platform_device msm_kgsl_2d0;
-extern struct platform_device msm_kgsl_2d1;
-#endif
 extern struct platform_device msm_device_gpio;
 extern struct platform_device msm_device_vidc;
+extern struct platform_device apq8064_msm_device_vidc;
 
 extern struct platform_device msm_charm_modem;
-
+extern struct platform_device msm_device_tz_log;
 #ifdef CONFIG_HW_RANDOM_MSM
 extern struct platform_device msm_device_rng;
 #endif

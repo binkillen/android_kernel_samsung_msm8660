@@ -19,17 +19,14 @@
 
 struct sii9234_platform_data {
 	int (*get_irq)(void);
-	int gpio;
-	void (*hw_reset)(void);
 	void (*hw_onoff)(bool);
-
-	void (*hw_off)(void);
-	int (*hw_device_init)(void);
-	/* TBD */
-#ifdef CONFIG_VIDEO_MHL_V2
-	int prio;
+	void (*hw_reset)(void);
+	/*TBD*/
+	int gpio;
 	void (*mhl_sel)(bool);
 	void (*gpio_cfg)(void);
+#if defined(CONFIG_VIDEO_MHL_V2) || defined(CONFIG_VIDEO_MHL_TAB_V2)
+	int prio;
 	void (*enable)(bool enable);
 	void (*power)(int on);
 	void (*enable_vbus)(bool enable);
@@ -47,9 +44,7 @@ struct sii9234_platform_data {
 	u32 swing_level;
 };
 
-#ifdef CONFIG_VIDEO_MHL_V2
 extern u8 mhl_onoff_ex(bool on);
-#endif
 
 #endif
 

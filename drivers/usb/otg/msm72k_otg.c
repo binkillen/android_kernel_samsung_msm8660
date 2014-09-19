@@ -1299,7 +1299,7 @@ static void msm_otg_late_power_work(struct work_struct *w)
 	struct msm_otg *dev = container_of((struct delayed_work *)w, 
 					struct msm_otg, late_power_work);
 
-	dev_info(dev->otg.dev, "%s, ID=%d, booster=%d\n",
+	dev_info(dev->phy.dev, "%s, ID=%d, booster=%d\n",
 		__func__, test_bit(ID, &dev->inputs), dev->ndev.booster);
 
 	if (!test_bit(ID, &dev->inputs) &&
@@ -1309,6 +1309,7 @@ static void msm_otg_late_power_work(struct work_struct *w)
 	}
 }
 #endif
+
 static irqreturn_t msm_otg_irq(int irq, void *data)
 {
 	struct msm_otg *dev = data;
@@ -1379,15 +1380,15 @@ static irqreturn_t msm_otg_irq(int irq, void *data)
 #ifdef CONFIG_USB_HOST_NOTIFY
 			if (otgsc & OTGSC_BSV) {
 				the_msm_otg->ndev.booster = NOTIFY_POWER_ON;
-				dev_info(the_msm_otg->otg.dev, "Acc power on detect\n");
+				dev_info(the_msm_otg->phy.dev, "Acc power on detect\n");
 			}
 			else {
 				if (the_msm_otg->ndev.mode == NOTIFY_HOST_MODE) {
 					host_state_notify(&the_msm_otg->ndev, NOTIFY_HOST_OVERCURRENT);
-					dev_err(the_msm_otg->otg.dev, "OTG overcurrent!!!!!!\n");
+					dev_err(the_msm_otg->phy.dev, "OTG overcurrent!!!!!!\n");
 				}
 				else {
-					dev_info(the_msm_otg->otg.dev, "Acc power off detect\n");
+					dev_info(the_msm_otg->phy.dev, "Acc power off detect\n");
 				}
 				the_msm_otg->ndev.booster = NOTIFY_POWER_OFF;
 			}
@@ -2999,7 +3000,7 @@ static int __init msm_otg_probe(struct platform_device *pdev)
 
 #ifdef CONFIG_USB_HOST_NOTIFY
 err_irq:
-	otg_set_transceiver(NULL);
+	usb_set_transceiver(NULL);
 #endif
 chg_deinit:
 	if (dev->pdata->chg_init)

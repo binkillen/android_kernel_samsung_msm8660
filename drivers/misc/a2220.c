@@ -14,6 +14,7 @@
  */
 
 #include <linux/interrupt.h>
+#include <linux/module.h>
 #include <linux/i2c.h>
 #include <linux/slab.h>
 #include <linux/irq.h>
@@ -185,7 +186,7 @@ static void a2220_i2c_sw_reset(unsigned int reset_cmd)
 static ssize_t  a2220_hw_reset(struct a2220img *img)
 {
 	struct a2220img *vp = img;
-	int rc,i, pass = 0;
+	int rc = 0,i = 0, pass = 0;
 	int remaining;
 	int retry = RETRY_CNT;
 	unsigned char *index;
@@ -806,6 +807,7 @@ unsigned char phonecall_receiver_nsoff[] = {
 	0x80, 0x1C, 0x00, 0x01, // 0x801C:VoiceProcessingOn, 0x0001:On
 	0x80, 0x17, 0x00, 0x02, 0x80, 0x18, 0x00, 0x00, // 0x8017:SetAlgorithmParmID, 0x0002:Microphone Configuration, 0x8018:SetAlgorithmParm, 0x0000:2-mic Close Talk (CT)
 	0x80, 0x26, 0x00, 0x1A, // 0x8026:SelectRouting, 0x001A:Pri,Sec,Fei,Zro,Zro,Zro,Zro,Zro - Snk,Snk,Snk,Snk,Csp,Snk,Feo,Snk
+
 	0x80, 0x1B, 0x00, 0x0c, // 0x801B:SetDigitalInputGain, 0x00:PCM-A left, 0x12:(18 dB)
 	0x80, 0x1B, 0x01, 0x08, // 0x801B:SetDigitalInputGain, 0x01:PCM-A right, 0x0F:(15 dB)
 	0x80, 0x15, 0x04, 0xF5, // 0x8015:SetDigitalInputGain, 0x04:PCM-C left, 0xEF:(-17 dB)
@@ -2126,7 +2128,13 @@ static int a2220_probe(
 #elif defined(CONFIG_USA_MODEL_SGH_I717)
 		pr_debug(MODULE_NAME "%s : GPIO 33\n", __func__);
 		gpio_tlmm_config(GPIO_CFG(33,0,GPIO_CFG_OUTPUT,GPIO_CFG_NO_PULL,GPIO_CFG_2MA),GPIO_CFG_ENABLE); // 2MIC_PWDN
-		//gpio_tlmm_config(GPIO_CFG(34,0,GPIO_CFG_OUTPUT,GPIO_CFG_PULL_DOWN,GPIO_CFG_2MA),GPIO_CFG_ENABLE); // 2MIC_PWDN#elif defined(CONFIG_USA_MODEL_SGH_I757)		pr_debug(MODULE_NAME "%s : GPIO 33\n", __func__);		gpio_tlmm_config(GPIO_CFG(33,0,GPIO_CFG_OUTPUT,GPIO_CFG_NO_PULL,GPIO_CFG_2MA),GPIO_CFG_ENABLE); // 2MIC_PWDN
+		//gpio_tlmm_config(GPIO_CFG(34,0,GPIO_CFG_OUTPUT,GPIO_CFG_PULL_DOWN,GPIO_CFG_2MA),GPIO_CFG_ENABLE); // 2MIC_PWDN
+
+#elif defined(CONFIG_USA_MODEL_SGH_I757)
+
+		pr_debug(MODULE_NAME "%s : GPIO 33\n", __func__);
+
+		gpio_tlmm_config(GPIO_CFG(33,0,GPIO_CFG_OUTPUT,GPIO_CFG_NO_PULL,GPIO_CFG_2MA),GPIO_CFG_ENABLE); // 2MIC_PWDN
 #else
 	if (pdata->gpio_a2220_wakeup) {
 		pr_debug(MODULE_NAME "%s : Wakeup GPIO %d\n", __func__, pdata->gpio_a2220_wakeup);
