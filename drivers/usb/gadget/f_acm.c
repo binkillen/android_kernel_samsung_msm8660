@@ -89,7 +89,7 @@ static unsigned int no_acm_smd_ports;
 static unsigned int nr_acm_ports;
 static unsigned int no_acm_hsic_sports;
 
-#define GSERIAL_NO_PORTS 2
+#define GSERIAL_NO_PORTS 3
 
 static struct acm_port_info {
 	enum transport_type	transport;
@@ -1134,10 +1134,5 @@ static int acm_init_port(int port_num, const char *name, const char *port_name)
 
 	nr_acm_ports++;
 
-	pr_info("%s:gport:tty_ports:%u sdio_ports:%u "
-			"smd_ports:%u nr_ports:%u\n",
-			__func__, no_acm_tty_ports, no_acm_sdio_ports,
-			no_acm_smd_ports, nr_acm_ports);
-	
 	return 0;
 }

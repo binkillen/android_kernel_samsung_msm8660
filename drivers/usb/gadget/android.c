@@ -21,7 +21,6 @@
 #ifdef SAMSUNG_ANDROID_USB_FEATURE
 #define CONFIG_USB_USE_ACM
 #endif
-
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/fs.h>
@@ -79,11 +78,7 @@
 #endif
 #include "f_adb.c"
 #include "f_ccid.c"
-#ifdef CONFIG_USB_ANDROID_SAMSUNG_MTP
-#include "f_mtp_samsung.c"
-#else
 #include "f_mtp.c"
-#endif
 #include "f_accessory.c"
 #ifdef CONFIG_USB_ANDROID_CDC_ECM
 #include "f_ecm.c"
@@ -285,9 +280,6 @@ static void android_work(struct work_struct *data)
 	unsigned long flags;
 	int pm_qos_vote = -1;
 
-	printk(KERN_DEBUG "usb: %s config=%p,connected=%d,sw_connected=%d\n",
-			__func__, cdev->config, dev->connected,
-			dev->sw_connected);
 	spin_lock_irqsave(&cdev->lock, flags);
 	if (cdev->config) {
 		uevent_envp = configured;
@@ -2235,13 +2227,6 @@ static ssize_t enable_store(struct device *pdev, struct device_attribute *attr,
 		list_for_each_entry(conf, &dev->configs, list_item)
 			list_for_each_entry(f, &conf->enabled_functions,
 						enabled_list) {
-#ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
-				if (!strcmp(f->name, "acm")) {
-					printk(KERN_DEBUG "usb: acm is enabled. (bcdDevice=0x400)\n");
-					/* Samsung KIES needs fixed bcdDevice number */
-					cdev->desc.bcdDevice = cpu_to_le16(0x0400);
-				}
-#endif
 				if (f->enable)
 					f->enable(f);
 			}
@@ -2566,25 +2551,7 @@ static void android_disconnect(struct usb_gadget *gadget)
 
 	spin_lock_irqsave(&cdev->lock, flags);
 	dev->connected = 0;
-#ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
-	/* avoid sending a disconnect switch event
-	 * until after we disconnect.
-	 */
-	if (cdev->mute_switch) {
-		dev->sw_connected = dev->connected;
-		printk(KERN_DEBUG "usb: %s mute_switch\n", __func__);
-	} else {
-		if (cdev->force_disconnect) {
-			printk(KERN_DEBUG "usb: %s force_disconnect\n",  __func__);
-			dev->sw_connected = 1;
-			cdev->force_disconnect = 0;
-		}
-		printk(KERN_DEBUG "usb: %s schedule_work\n", __func__);
-		schedule_work(&dev->work);
-	}
-#else
 	schedule_work(&dev->work);
-#endif
 	spin_unlock_irqrestore(&cdev->lock, flags);
 }
 
@@ -2655,11 +2622,11 @@ static struct android_configuration *alloc_android_config
 
 	dev->configs_num++;
 #ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
-	conf->usb_config.label = "android",
-	conf->usb_config.unbind = android_unbind_config,
-	conf->usb_config.bConfigurationValue = 1,
-	conf->usb_config.bmAttributes = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
-	conf->usb_config.bMaxPower = 0x30,
+	conf->usb_config.label = "android";
+	conf->usb_config.unbind = android_unbind_config;
+	conf->usb_config.bConfigurationValue = 1;
+	conf->usb_config.bmAttributes = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER;
+	conf->usb_config.bMaxPower = 0x30;
 #else
 	conf->usb_config.label = dev->name;
 	conf->usb_config.unbind = android_unbind_config;

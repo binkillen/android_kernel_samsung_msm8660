@@ -780,7 +780,7 @@ static int __exit ehci_msm_remove(struct platform_device *pdev)
 
 	pdata = pdev->dev.platform_data;
 	device_init_wakeup(&pdev->dev, 0);
-	
+
 #ifdef CONFIG_USB_HOST_NOTIFY
 	host_notify_dev_unregister(&hcd->ndev);
 #endif

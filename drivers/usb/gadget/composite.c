@@ -1411,7 +1411,6 @@ static void composite_disconnect(struct usb_gadget *gadget)
 	/* REVISIT:  should we have config and device level
 	 * disconnect callbacks?
 	 */
-	printk(KERN_DEBUG "usb: %s\n", __func__);
 	spin_lock_irqsave(&cdev->lock, flags);
 	if (cdev->config)
 		reset_config(cdev);

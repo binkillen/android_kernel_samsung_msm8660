@@ -190,6 +190,7 @@ usb_copy_descriptors(struct usb_descriptor_header **src)
 	return ret;
 }
 
+
 #ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 /**
  * usb_find_descriptor - find a copy of an descriptor header
@@ -295,3 +296,4 @@ int usb_change_cdc_call_mgmt_num(
 	return 0;
 }
 #endif
+

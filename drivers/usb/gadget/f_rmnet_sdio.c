@@ -34,7 +34,6 @@
 #include <linux/usb/cdc.h>
 #include <linux/usb/composite.h>
 #include <linux/usb/ch9.h>
-#include <linux/usb/android_composite.h>
 #include <linux/termios.h>
 #include <linux/debugfs.h>
 

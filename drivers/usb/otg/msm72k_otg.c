@@ -320,31 +320,6 @@ static inline void set_driver_amplitude(struct msm_otg *dev)
 	ulpi_write(dev, res, ULPI_CONFIG_REG2);
 }
 
-// for receiver sensitivity
-#define ULPI_SQUELCH_LEVEL_MASK	(3 << 6)
-#define ULPI_CONFIG_REG4	0X33
-
-enum squelch_level {
-	SQUELCH_LEVEL_1,
-	SQUELCH_LEVEL_2 = (1 << 6),
-	SQUELCH_LEVEL_3 = (1 << 7),
-	SQUELCH_LEVEL_4 = (3 << 6),
-};
-
-static inline void set_squelch_level(struct msm_otg *dev)
-{
-	unsigned res = 0;
-
-	if (!dev->pdata)
-		return;
-
-	res = ulpi_read(dev, ULPI_CONFIG_REG4);
-
-	res &= ~ULPI_SQUELCH_LEVEL_MASK;
-	res |= SQUELCH_LEVEL_1;
-	ulpi_write(dev, res, ULPI_CONFIG_REG4);
-}
-
 static const char *state_string(enum usb_otg_state state)
 {
 	switch (state) {
@@ -1299,9 +1274,6 @@ static void msm_otg_late_power_work(struct work_struct *w)
 	struct msm_otg *dev = container_of((struct delayed_work *)w, 
 					struct msm_otg, late_power_work);
 
-	dev_info(dev->phy.dev, "%s, ID=%d, booster=%d\n",
-		__func__, test_bit(ID, &dev->inputs), dev->ndev.booster);
-
 	if (!test_bit(ID, &dev->inputs) &&
 		(dev->ndev.booster == NOTIFY_POWER_OFF)) {
 		if (dev->pdata->vbus_power)
@@ -1309,7 +1281,6 @@ static void msm_otg_late_power_work(struct work_struct *w)
 	}
 }
 #endif
-
 static irqreturn_t msm_otg_irq(int irq, void *data)
 {
 	struct msm_otg *dev = data;
@@ -1347,11 +1318,8 @@ static irqreturn_t msm_otg_irq(int irq, void *data)
 	state = dev->phy.state;
 	spin_unlock_irqrestore(&dev->lock, flags);
 
-	if(printk_ratelimit()){
-		pr_debug("IRQ state: %s\n", state_string(state));
-		pr_debug("otgsc = %x\n", otgsc);
-		printk("%s: IRQ state: %s\t otgsc = %x\n", __func__, state_string(state), otgsc);
-	}
+	pr_debug("IRQ state: %s\n", state_string(state));
+	pr_debug("otgsc = %x\n", otgsc);
 
 	if ((otgsc & OTGSC_IDIE) && (otgsc & OTGSC_IDIS)) {
 		if (otgsc & OTGSC_ID) {
@@ -1368,7 +1336,6 @@ static irqreturn_t msm_otg_irq(int irq, void *data)
 		}
 		writel(otgsc, USB_OTGSC);
 		work = 1;
-		printk("%s HOST irq\n", __func__);
 	} else if (otgsc & OTGSC_BSVIS) {
 		writel(otgsc, USB_OTGSC);
 		/* BSV interrupt comes when operating as an A-device
@@ -1378,18 +1345,12 @@ static irqreturn_t msm_otg_irq(int irq, void *data)
 		if ((state >= OTG_STATE_A_IDLE) &&
 			!test_bit(ID_A, &dev->inputs)) {
 #ifdef CONFIG_USB_HOST_NOTIFY
-			if (otgsc & OTGSC_BSV) {
+			if (otgsc & OTGSC_BSV)
 				the_msm_otg->ndev.booster = NOTIFY_POWER_ON;
-				dev_info(the_msm_otg->phy.dev, "Acc power on detect\n");
-			}
 			else {
-				if (the_msm_otg->ndev.mode == NOTIFY_HOST_MODE) {
+				if (the_msm_otg->ndev.mode == NOTIFY_HOST_MODE)
 					host_state_notify(&the_msm_otg->ndev, NOTIFY_HOST_OVERCURRENT);
-					dev_err(the_msm_otg->phy.dev, "OTG overcurrent!!!!!!\n");
-				}
-				else {
-					dev_info(the_msm_otg->phy.dev, "Acc power off detect\n");
-				}
+
 				the_msm_otg->ndev.booster = NOTIFY_POWER_OFF;
 			}
 #endif
@@ -1411,10 +1372,7 @@ static irqreturn_t msm_otg_irq(int irq, void *data)
 		work = 1;
 	} else if (sts & STS_PCI) {
 		pc = readl(USB_PORTSC);
-
-		if(printk_ratelimit())
-			pr_debug("portsc = %x\n", pc);
-
+		pr_debug("portsc = %x\n", pc);
 		ret = IRQ_NONE;
 		/* HCD Acks PCI interrupt. We use this to switch
 		 * between different OTG states.
@@ -1701,7 +1659,6 @@ reset_link:
 	set_cdr_auto_reset(dev);
 	set_driver_amplitude(dev);
 	set_se1_gating(dev);
-	set_squelch_level(dev);
 
 	writel(0x0, USB_AHB_BURST);
 	writel(0x00, USB_AHB_MODE);
@@ -1803,7 +1760,6 @@ static void msm_otg_sm_work(struct work_struct *w)
 			break;
 		}
 
-		printk("%s %d id=%d OTG_STATE_UNDEFINED\n", __func__, __LINE__, test_bit(ID, &dev->inputs));
 		/* Reset both phy and link */
 		otg_reset(&dev->phy, 1);
 
@@ -2666,7 +2622,7 @@ static int otg_debugfs_init(struct msm_otg *dev)
 	if (!otg_debug_root)
 		return -ENOENT;
 
-	otg_debug_mode = debugfs_create_file("mode", 0664,
+	otg_debug_mode = debugfs_create_file("mode", 0222,
 						otg_debug_root, dev,
 						&otgfs_fops);
 	if (!otg_debug_mode)
@@ -3000,7 +2956,6 @@ static int __init msm_otg_probe(struct platform_device *pdev)
 
 #ifdef CONFIG_USB_HOST_NOTIFY
 err_irq:
-	usb_set_transceiver(NULL);
 #endif
 chg_deinit:
 	if (dev->pdata->chg_init)
