@@ -4146,7 +4146,11 @@ unsigned char hdmi_is_primary;
 
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 #define MSM_ION_AUDIO_SIZE	MSM_PMEM_AUDIO_SIZE
+#ifdef CONFIG_QSEECOM
 #define MSM_ION_HEAP_NUM	9
+#else
+#define MSM_ION_HEAP_NUM	8
+#endif
 #define MSM_HDMI_PRIM_ION_SF_SIZE MSM_HDMI_PRIM_PMEM_SF_SIZE
 static unsigned msm_ion_sf_size = MSM_ION_SF_SIZE;
 #else
@@ -8933,6 +8937,7 @@ static struct platform_device msm_adc_device = {
 	},
 };
 
+#ifdef CONFIG_MSM_RTB
 static struct msm_rtb_platform_data msm_rtb_pdata = {
 	.size = SZ_1M,
 };
@@ -8955,6 +8960,7 @@ static struct platform_device msm_rtb_device = {
 		.platform_data = &msm_rtb_pdata,
 	},
 };
+#endif
 
 static void pmic8058_xoadc_mpp_config(void)
 {
@@ -9470,6 +9476,7 @@ static struct platform_device *asoc_devices[] __initdata = {
 	&asoc_msm_dai1,
 };
 
+#ifdef CONFIG_QSEECOM
 /* qseecom bus scaling */
 static struct msm_bus_vectors qseecom_clks_init_vectors[] = {
 	{
@@ -9544,9 +9551,13 @@ static struct platform_device qseecom_device = {
 		.platform_data = &qseecom_bus_pdata,
 	},
 };
+#endif
 
 static struct platform_device *surf_devices[] __initdata = {
 	&msm8x60_device_acpuclk,
+#ifdef CONFIG_ANDROID_RAM_CONSOLE
+	&ram_console_device,
+#endif
 	&msm_device_smd,
 	&msm_device_uart_dm12,
 	&msm_pil_q6v3,
@@ -9554,7 +9565,9 @@ static struct platform_device *surf_devices[] __initdata = {
 	&msm_pil_tzapps,
 	&msm_pil_dsps,
 	&msm_pil_vidc,
+#ifdef CONFIG_QSEECOM
 	&qseecom_device,
+#endif
 #ifdef CONFIG_I2C_QUP
 #if defined (CONFIG_TARGET_LOCALE_USA)
         &msm_gsbi1_qup_i2c_device,
@@ -9733,7 +9746,9 @@ static struct platform_device *surf_devices[] __initdata = {
 #endif
 	&msm8660_device_watchdog,
 	&msm_device_tz_log,
+#ifdef CONFIG_MSM_RTB
 	&msm_rtb_device,
+#endif
 	&msm8660_iommu_domain_device,
 #if defined (CONFIG_SAMSUNG_JACK) || defined (CONFIG_SAMSUNG_EARJACK)
 	&sec_device_jack,
@@ -9760,9 +9775,6 @@ static struct platform_device *surf_devices[] __initdata = {
 	&akm_i2c_gpio_device,
 #endif
 	&motor_i2c_gpio_device,
-#ifdef CONFIG_ANDROID_RAM_CONSOLE
-	&ram_console_device,
-#endif
 };
 
 #ifdef CONFIG_ION_MSM
@@ -9794,6 +9806,7 @@ static struct ion_cp_heap_pdata cp_wb_ion_pdata = {
 
 static struct ion_co_heap_pdata mm_fw_co_ion_pdata = {
 	.adjacent_mem_id = ION_CP_MM_HEAP_ID,
+	.align = SZ_128K,
 };
 
 static struct ion_co_heap_pdata co_ion_pdata = {
@@ -9871,6 +9884,7 @@ struct ion_platform_heap msm8x60_heaps [] = {
 			.memory_type = ION_EBI_TYPE,
 			.extra_data = (void *) &cp_wb_ion_pdata,
 		},
+#ifdef CONFIG_QSEECOM
 		{
 			.id	= ION_QSECOM_HEAP_ID,
 			.type	= ION_HEAP_TYPE_CARVEOUT,
@@ -9879,6 +9893,7 @@ struct ion_platform_heap msm8x60_heaps [] = {
 			.memory_type = ION_EBI_TYPE,
 			.extra_data = (void *) &co_ion_pdata,
 		},
+#endif
 		{
 			.id	= ION_AUDIO_HEAP_ID,
 			.type	= ION_HEAP_TYPE_CARVEOUT,
@@ -9971,7 +9986,9 @@ static void __init reserve_ion_memory(void)
 	msm8x60_reserve_table[MEMTYPE_EBI1].size += MSM_ION_CAMERA_SIZE;
 	msm8x60_reserve_table[MEMTYPE_EBI1].size += MSM_ION_WB_SIZE;
 	msm8x60_reserve_table[MEMTYPE_EBI1].size += MSM_ION_AUDIO_SIZE;
+#ifdef CONFIG_QSEECOM
 	msm8x60_reserve_table[MEMTYPE_EBI1].size += MSM_ION_QSECOM_SIZE;
+#endif
 #endif
 }
 
