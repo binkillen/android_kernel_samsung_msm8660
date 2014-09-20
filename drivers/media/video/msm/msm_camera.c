@@ -647,14 +647,11 @@ static int __msm_pmem_table_del(struct msm_sync *sync,
 					pinfo->vaddr == region->info.vaddr &&
 					pinfo->fd == region->info.fd) {
 				hlist_del(node);
-				spin_unlock_irqrestore(&sync->pmem_frame_spinlock, flags); //spinlock_test
-				
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 				ion_free(client_for_ion, region->handle);
 #else
 				put_pmem_file(region->file);
 #endif
-				spin_lock_irqsave(&sync->pmem_frame_spinlock, flags); //spinlock_test
 				kfree(region);
 				CDBG("%s: type %d, vaddr  0x%p\n",
 					__func__, pinfo->type, pinfo->vaddr);
@@ -674,14 +671,11 @@ static int __msm_pmem_table_del(struct msm_sync *sync,
 				pinfo->vaddr == region->info.vaddr &&
 				pinfo->fd == region->info.fd) {
 				hlist_del(node);
-				spin_unlock_irqrestore(&sync->pmem_frame_spinlock, flags);  //spinlock_test
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 				ion_free(client_for_ion, region->handle);
 #else
 				put_pmem_file(region->file);
 #endif
-				spin_lock_irqsave(&sync->pmem_frame_spinlock, flags);//spinlock_test
-
 				kfree(region);
 				CDBG("%s: type %d, vaddr  0x%p\n",
 					__func__, pinfo->type, pinfo->vaddr);
@@ -700,14 +694,11 @@ static int __msm_pmem_table_del(struct msm_sync *sync,
 					pinfo->vaddr == region->info.vaddr &&
 					pinfo->fd == region->info.fd) {
 				hlist_del(node);
-				spin_unlock_irqrestore(&sync->pmem_stats_spinlock, flags); //spinlock_test
-				
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 				ion_free(client_for_ion, region->handle);
 #else
 				put_pmem_file(region->file);
 #endif
-				spin_lock_irqsave(&sync->pmem_stats_spinlock, flags); //spinlock_test
 				kfree(region);
 				CDBG("%s: type %d, vaddr  0x%p\n",
 					__func__, pinfo->type, pinfo->vaddr);
@@ -1037,7 +1028,7 @@ static int msm_control(struct msm_control_device *ctrl_pmsm,
 	msm_queue_drain(&ctrl_pmsm->ctrl_q, list_control);
 	qcmd_resp = __msm_control(sync,
 				  &ctrl_pmsm->ctrl_q,
-				  qcmd, msecs_to_jiffies(4000)); // 10000-> 4000 reduce waiting time
+				  qcmd, msecs_to_jiffies(10000));
 
 	/* ownership of qcmd will be transfered to event queue */
 	qcmd = NULL;
@@ -2009,8 +2000,13 @@ static int msm_get_sensor_info(struct msm_sync *sync, void __user *arg)
 	memcpy(&info.name[0],
 		sdata->sensor_name,
 		MAX_SENSOR_NAME);
+#ifndef CONFIG_SAMSUNG_FEATURE
+	info.flash_enabled = sdata->flash_data->flash_type !=
+		MSM_CAMERA_FLASH_NONE;
+#else
 	info.flash_enabled = MSM_CAMERA_FLASH_NONE; //sdata->flash_data->flash_type !=
 		//MSM_CAMERA_FLASH_NONE;
+#endif
 
 	/* copy back to user space */
 	if (copy_to_user((void *)arg,
@@ -3033,9 +3029,11 @@ static long msm_ioctl_control(struct file *filep, unsigned int cmd,
 	case MSM_CAM_IOCTL_GET_CAMERA_INFO:
 		rc = msm_get_camera_info(argp);
 		break;
+#ifdef CONFIG_SAMSUNG_MSM_CAMERA
 	case MSM_CAM_IOCTL_EXT_CONFIG:
 	        rc = pmsm->sync->sctrl.s_ext_config(argp);
 		break;
+#endif
 	default:
 		rc = msm_ioctl_common(pmsm, cmd, argp);
 		break;

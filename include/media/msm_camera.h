@@ -249,6 +249,11 @@
 #define MSM_CAM_IOCTL_INTF_MCTL_MAPPING_CFG \
 	_IOR(MSM_CAM_IOCTL_MAGIC, 71, struct intf_mctl_mapping_cfg *)
 
+#ifdef CONFIG_SAMSUNG_FEATURE
+#define MSM_CAM_IOCTL_EXT_CONFIG \
+	_IOWR(MSM_CAM_IOCTL_MAGIC, 50, sensor_ext_cfg_data)
+#endif
+
 struct ioctl_native_cmd {
 	unsigned short mode;
 	unsigned short address;
@@ -1036,6 +1041,7 @@ struct msm_snapshot_pp_status {
 #define SENSOR_HFR_60FPS_MODE 3
 #define SENSOR_HFR_90FPS_MODE 4
 #define SENSOR_HFR_120FPS_MODE 5
+#define SENSOR_SNAPSHOT_TRANSFER	6
 
 #define SENSOR_QTR_SIZE			0
 #define SENSOR_FULL_SIZE		1
@@ -1115,6 +1121,153 @@ struct msm_snapshot_pp_status {
 #define CAMERA_EXPOSURE_COMPENSATION_LV2			0
 #define CAMERA_EXPOSURE_COMPENSATION_LV3			-6
 #define CAMERA_EXPOSURE_COMPENSATION_LV4			-12
+
+#ifdef CONFIG_SAMSUNG_FEATURE
+enum msm_sensor_mode {
+	SENSOR_CAMERA,
+	SENSOR_MOVIE,
+};
+
+enum camera_scene_mode
+{
+	SCENE_MODE_BASE, /* 0 */
+	SCENE_MODE_NONE,
+	SCENE_MODE_PORTRAIT,
+	SCENE_MODE_NIGHTSHOT,
+	SCENE_MODE_BACK_LIGHT,
+	SCENE_MODE_LANDSCAPE, /* 5 */
+	SCENE_MODE_SPORTS,
+	SCENE_MODE_PARTY_INDOOR,
+	SCENE_MODE_BEACH_SNOW,
+	SCENE_MODE_SUNSET,
+	SCENE_MODE_DUSK_DAWN,  /* 10 */
+	SCENE_MODE_FALL_COLOR,
+	SCENE_MODE_FIREWORKS,
+	SCENE_MODE_TEXT,
+	SCENE_MODE_CANDLE_LIGHT,
+	SCENE_MODE_MAX, /* 15 */
+};
+
+enum camera_focusmode {
+	FOCUS_MODE_AUTO = 0,
+	FOCUS_MODE_MACRO,
+	FOCUS_MODE_INFINITY,
+	FOCUS_MODE_FIXED,
+	FOCUS_MODE_FACEDETECT,
+	FOCUS_MODE_CONTINOUS,
+	FOCUS_MODE_TOUCH,
+	FOCUS_MODE_TOUCH_MACRO,
+	FOCUS_MODE_MAX,
+	FOCUS_MODE_DEFAULT = (1 << 8),
+};
+
+enum ext_cfg_command
+{
+    EXT_CFG_SET_FLASH = 0,
+    EXT_CFG_SET_SCENE,
+    EXT_CFG_SET_SHARPNESS,
+    EXT_CFG_SET_EFFECT,  
+    EXT_CFG_SET_SATURATION,
+    EXT_CFG_SET_ISO, // 5
+    EXT_CFG_SET_WB,
+    EXT_CFG_SET_CONTRAST,
+    EXT_CFG_SET_BRIGHTNESS, 
+    EXT_CFG_SET_ZOOM,
+    EXT_CFG_SET_FPS, // 10
+    EXT_CFG_SET_AF_MODE,
+    EXT_CFG_SET_AF_START,
+    EXT_CFG_SET_AF_STOP,
+    EXT_CFG_SET_AF_OPERATION,
+    EXT_CFG_SET_TOUCHAF_MODE, // 15
+    EXT_CFG_GET_AF_STATUS,
+    EXT_CFG_SET_TOUCHAF_POS,
+    EXT_CFG_SET_METERING,
+    EXT_CFG_SET_PREVIEW_SIZE,
+    EXT_CFG_SET_PICTURE_SIZE, // 20
+    EXT_CFG_SET_JPEG_QUALITY,
+    EXT_CFG_GET_JPEG_SIZE,
+    EXT_CFG_SET_ANTISHAKE,
+    EXT_CFG_SET_WDR,
+    EXT_CFG_SET_DTP, // 25
+    EXT_CFG_SET_AE_AWB,
+    EXT_CFG_SET_FRONT_CAMERA_MODE,
+    EXT_CFG_SET_BEAUTY,
+    EXT_CFG_SET_BLUR,
+    EXT_CFG_TEST_ESD, // 30
+    EXT_CFG_SET_MOVIE_MODE,
+    EXT_CFG_SET_FIRMWARE_UPDATE,
+    EXT_CFG_GET_SENSOR_FW_VER,
+    EXT_CFG_SET_VT_MODE,
+    EXT_CFG_SET_FLIP, // 36 
+    EXT_CFG_GET_EXIF,
+    EXT_CFG_SET_HDR,
+    EXT_CFG_MAX,
+    EXT_CFG_SET_LOW_LEVEL = 51,
+    EXT_CFG_SET_APPS = 52,
+};
+
+typedef struct{
+    char     category;
+    char     byte;
+    char     value;
+}ioctl_m5mo_info_8bit;
+
+typedef struct{
+    int		category;
+    int		byte;
+	int		value;
+}ioctl_m5mo_info;
+
+typedef struct{
+    int		address;
+    int 	size;
+    char	*value;
+    int 	pgh_magic;
+}ioctl_m5mo_i2c_memory_info;
+
+typedef struct{
+    int address;
+    int value;
+    int codeA;
+    int codeB;
+    int codeC;
+} ioctl_msg_info;
+
+typedef struct{
+	uint32_t cmd;
+	uint32_t  value_1;
+	uint32_t  value_2;
+	void *value_string;	
+} sensor_ext_cfg_data;
+
+typedef struct {
+	char company;
+	char module_vesion;
+	char year;
+	char month;
+	char update_times[2];
+} sensor_version_info;
+
+typedef struct {
+	uint32_t dev_num;
+	char module_name[10];
+} sensor_name_info;
+
+#define	READ_FW_VERSION		1
+#define	UPDATE_M5MO_FW		2
+#define	READ_UPDATE_STATE	3
+
+#define EXIF_EXPOSURE_TIME	0
+#define EXIF_TV			1
+#define EXIF_AV			2
+#define EXIF_BV			3
+#define EXIF_EBV		4
+#define EXIF_ISO		5
+#define EXIF_FLASH		6
+
+#define SIZE_MAIN		0
+#define SIZE_THUMB		1
+#endif /* CONFIG_SAMSUNG_FEATURE */
 
 enum msm_v4l2_saturation_level {
 	MSM_V4L2_SATURATION_L0,

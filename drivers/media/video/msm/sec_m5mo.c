@@ -1072,17 +1072,17 @@ static int m5mo_set_effect_color(int8_t effect)
 	cr = 0x00;
 
 	switch(effect) {
-	case CAMERA_EFFECT_OFF:
+	case MSM_V4L2_EFFECT_OFF:
 		break;
-	case CAMERA_EFFECT_SEPIA:
+	case MSM_V4L2_EFFECT_SEPIA:
 		cb = 0xD8;
 		cr = 0x18;
 		break;
-	case CAMERA_EFFECT_AQUA:
+	case MSM_V4L2_EFFECT_AQUA:
 		cb = 0x40;
 		cr = 0x00;
 		break;
-	case CAMERA_EFFECT_MONO:
+	case MSM_V4L2_EFFECT_MONO:
 		cb = 0x00;
 		cr = 0x00;
 		break;
@@ -1092,10 +1092,10 @@ static int m5mo_set_effect_color(int8_t effect)
 	}
 
 
-	err = m5mo_writeb( M5MO_CATEGORY_MON, M5MO_MON_COLOR_EFFECT, effect == CAMERA_EFFECT_OFF ? 0x00 : 0x01);
+	err = m5mo_writeb( M5MO_CATEGORY_MON, M5MO_MON_COLOR_EFFECT, effect == MSM_V4L2_EFFECT_OFF ? 0x00 : 0x01);
 	CHECK_ERR(err);
 
-	if (effect != CAMERA_EFFECT_OFF) {
+	if (effect != MSM_V4L2_EFFECT_OFF) {
 		err = m5mo_writeb(M5MO_CATEGORY_MON, M5MO_MON_CFIXB, cb);
 		CHECK_ERR(err);
 		err = m5mo_writeb(M5MO_CATEGORY_MON, M5MO_MON_CFIXR, cr);
@@ -1123,7 +1123,7 @@ static int m5mo_set_effect_gamma(int8_t val)
 	}	
 
 	switch(val) {
-	case CAMERA_EFFECT_NEGATIVE:
+	case MSM_V4L2_EFFECT_NEGATIVE:
 		effect = 0x01;
 		break;
 	default:
@@ -1162,20 +1162,20 @@ static long m5mo_set_effect(	int8_t effect)
 
 retry:
 	switch(effect) {
-	case CAMERA_EFFECT_OFF:
-	case CAMERA_EFFECT_SEPIA:
-	case CAMERA_EFFECT_MONO:
-	case CAMERA_EFFECT_AQUA:
+	case MSM_V4L2_EFFECT_OFF:
+	case MSM_V4L2_EFFECT_SEPIA:
+	case MSM_V4L2_EFFECT_MONO:
+	case MSM_V4L2_EFFECT_AQUA:
 		err = m5mo_set_effect_color(effect);
 		CHECK_ERR(err);
 		break;
-	case CAMERA_EFFECT_NEGATIVE:
+	case MSM_V4L2_EFFECT_NEGATIVE:
 		err = m5mo_set_effect_gamma(effect);
 		CHECK_ERR(err);
 		break;
 	default:
 		cam_err("Invalid(%d)", effect);
-		effect = CAMERA_EFFECT_OFF;
+		effect = MSM_V4L2_EFFECT_OFF;
 		goto retry;
 	}
 

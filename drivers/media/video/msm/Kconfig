@@ -9,6 +9,12 @@ config MSM_CAMERA_V4L2
           native APIs are used through /dev/config0, /dev/frame0,
           and /dev/control0.
 
+config SAMSUNG_FEATURE
+	bool
+	depends on ARCH_MSM8X60 && MSM_CAMERA
+	depends on !TARGET_SERIES_DUMMY
+	default y
+
 comment "Camera Sensor Selection"
 config MT9T013
 	bool "Sensor mt9t013 (BAYER 3M)"
