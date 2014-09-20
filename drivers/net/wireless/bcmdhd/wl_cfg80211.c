@@ -264,12 +264,6 @@ static s32 wl_cfg80211_get_key(struct wiphy *wiphy, struct net_device *dev,
 static s32 wl_cfg80211_config_default_mgmt_key(struct wiphy *wiphy,
 	struct net_device *dev,	u8 key_idx);
 static s32 wl_cfg80211_resume(struct wiphy *wiphy);
-#if 0 || (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
-static s32 wl_cfg80211_mgmt_tx_cancel_wait(struct wiphy *wiphy,
-	struct net_device *dev, u64 cookie);
-static s32 wl_cfg80211_del_station(struct wiphy *wiphy,
-	struct net_device *ndev, u8* mac_addr);
-#endif
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 39)
 static s32 wl_cfg80211_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow);
 #else
@@ -377,7 +371,6 @@ static void wl_ch_to_chanspec(int ch,
  */
 static void wl_rst_ie(struct wl_priv *wl);
 static __used s32 wl_add_ie(struct wl_priv *wl, u8 t, u8 l, u8 *v);
-static void wl_update_hidden_ap_ie(struct wl_bss_info *bi, u8 *ie_stream, u32 *ie_size);
 static s32 wl_mrg_ie(struct wl_priv *wl, u8 *ie_stream, u16 ie_size);
 static s32 wl_cp_ie(struct wl_priv *wl, u8 *dst, u16 dst_size);
 static u32 wl_get_ielen(struct wl_priv *wl);
@@ -5606,53 +5599,6 @@ static s32 wl_cfg80211_hostapd_sec(
 	return 0;
 }
 
-#if 0 || (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
-static s32
-wl_cfg80211_del_station(
-	struct wiphy *wiphy,
-	struct net_device *ndev,
-	u8* mac_addr)
-{
-	struct net_device *dev;
-	struct wl_priv *wl = wiphy_priv(wiphy);
-	scb_val_t scb_val;
-	s8 eabuf[ETHER_ADDR_STR_LEN];
-
-	WL_DBG(("Entry\n"));
-	if (mac_addr == NULL) {
-		WL_DBG(("mac_addr is NULL ignore it\n"));
-		return 0;
-	}
-
-	if (ndev == wl->p2p_net) {
-		dev = wl_to_prmry_ndev(wl);
-	} else {
-		dev = ndev;
-	}
-
-	if (p2p_is_on(wl)) {
-		/* Suspend P2P discovery search-listen to prevent it from changing the
-		 * channel.
-		 */
-		if ((wl_cfgp2p_discover_enable_search(wl, false)) < 0) {
-			WL_ERR(("Can not disable discovery mode\n"));
-			return -EFAULT;
-		}
-	}
-
-	memcpy(scb_val.ea.octet, mac_addr, ETHER_ADDR_LEN);
-	scb_val.val = DOT11_RC_DEAUTH_LEAVING;
-	if (wldev_ioctl(dev, WLC_SCB_DEAUTHENTICATE_FOR_REASON, &scb_val,
-		sizeof(scb_val_t), true))
-		WL_ERR(("WLC_SCB_DEAUTHENTICATE_FOR_REASON failed\n"));
-	WL_DBG(("Disconnect STA : %s scb_val.val %d\n",
-		bcm_ether_ntoa((const struct ether_addr *)mac_addr, eabuf),
-		scb_val.val));
-	wl_delay(400);
-	return 0;
-}
-#endif 
-
 //#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 4, 0)
 #if 1
 static s32
@@ -6094,12 +6040,6 @@ static struct cfg80211_ops wl_cfg80211_ops = {
 	.sched_scan_start = wl_cfg80211_sched_scan_start,
 	.sched_scan_stop = wl_cfg80211_sched_scan_stop,
 #endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0) */
-#if 0 || (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
-#ifndef CUSTOMER_HW4
-	.del_station = wl_cfg80211_del_station,
-#endif /* CUSTOMER_HW4 */
-	.mgmt_tx_cancel_wait = wl_cfg80211_mgmt_tx_cancel_wait,
-#endif 
 };
 
 s32 wl_mode_to_nl80211_iftype(s32 mode)
@@ -9824,29 +9764,6 @@ static __used s32 wl_add_ie(struct wl_priv *wl, u8 t, u8 l, u8 *v)
 	return err;
 }
 
-static void wl_update_hidden_ap_ie(struct wl_bss_info *bi, u8 *ie_stream, u32 *ie_size)
-{
-	u8 *ssidie;
-
-	ssidie = (u8 *)cfg80211_find_ie(WLAN_EID_SSID, ie_stream, *ie_size);
-	if (!ssidie)
-		return;
-	if (ssidie[1] != bi->SSID_len) {
-		if (ssidie[1]) {
-			WL_ERR(("%s: Wrong SSID len: %d != %d\n", __func__, ssidie[1], bi->SSID_len));
-			return;
-		}
-		memmove(ssidie + bi->SSID_len + 2, ssidie + 2, *ie_size - (ssidie + 2 - ie_stream));
-		memcpy(ssidie + 2, bi->SSID, bi->SSID_len);
-		*ie_size = *ie_size + bi->SSID_len;
-		ssidie[1] = bi->SSID_len;
-		return;
-	}
-	if (*(ssidie + 2) == '\0')
-		memcpy(ssidie + 2, bi->SSID, bi->SSID_len);
-	return;
-}
-
 static s32 wl_mrg_ie(struct wl_priv *wl, u8 *ie_stream, u16 ie_size)
 {
 	struct wl_ie *ie = wl_to_ie(wl);
@@ -10127,20 +10044,6 @@ void wl_cfg80211_enable_trace(bool set, u32 level)
 	else
 		wl_dbg_level |= (WL_DBG_LEVEL & level);
 }
-#if 0 || (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
-static s32
-wl_cfg80211_mgmt_tx_cancel_wait(struct wiphy *wiphy,
-	struct net_device *dev, u64 cookie)
-{
-	/* CFG80211 checks for tx_cancel_wait callback when ATTR_DURATION
-	 * is passed with CMD_FRAME. This callback is supposed to cancel
-	 * the OFFCHANNEL Wait. Since we are already taking care of that
-	 *  with the tx_mgmt logic, do nothing here.
-	 */
-
-	return 0;
-}
-#endif /* WL_SUPPORT_BACKPORTED_PATCHES || KERNEL >= 3.2.0 */
 
 #ifdef WL11U
 bcm_tlv_t *
@@ -10260,3 +10163,4 @@ wl_cfg80211_set_band(struct net_device *ndev, int band)
 	return 0;
 }
 #endif /* WL_HOST_BAND_MGMT */
+
