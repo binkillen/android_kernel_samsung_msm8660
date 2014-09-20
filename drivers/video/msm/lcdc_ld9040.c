@@ -61,6 +61,7 @@
 #include "msm_fb.h"
 #include <linux/fb.h>
 #include <linux/backlight.h>
+#include <linux/earlysuspend.h>
 #include <linux/miscdevice.h>
 #include "mdp4_video_enhance.h"
 #include <linux/regulator/consumer.h>

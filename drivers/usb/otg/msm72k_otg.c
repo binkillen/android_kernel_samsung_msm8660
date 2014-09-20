@@ -874,7 +874,7 @@ static int msm_otg_resume(struct msm_otg *dev)
 		}
 	}
 	if (dev->pdata->ldo_set_voltage)
-		dev->pdata->ldo_set_voltage(3600000);
+		dev->pdata->ldo_set_voltage(3400);
 
 	/* Vote for TCXO when waking up the phy */
 	ret = msm_xo_mode_vote(dev->xo_handle, MSM_XO_MODE_ON);
@@ -1883,7 +1883,7 @@ static void msm_otg_sm_work(struct work_struct *w)
 			msm_otg_put_suspend(dev);
 
 			if (dev->pdata->ldo_set_voltage)
-				dev->pdata->ldo_set_voltage(3050000);
+				dev->pdata->ldo_set_voltage(3075);
 		}
 		break;
 	case OTG_STATE_B_SRP_INIT:
