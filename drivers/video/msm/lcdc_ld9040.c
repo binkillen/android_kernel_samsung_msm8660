@@ -104,7 +104,6 @@ struct ld9040 {
 	struct lcd_device		*ld;
 	struct backlight_device		*bd;
 	struct lcd_platform_data	*lcd_pd;
-	struct early_suspend    early_suspend;
 #if defined(SMART_DIMMING)
 	boolean	isSmartDimming;
 	boolean	isSmartDimming_loaded;
@@ -651,11 +650,11 @@ static void ld9040_config_gpios(int enable)
 	printk("ld9040 : lcdc_config_gpios [%d]\n", enable);
 	if (enable) {
 		for(i = 0; i < ARRAY_SIZE(lcdc_gpio_config_data); i++) {
-			gpio_tlmm_config(lcdc_gpio_config_data[i].gpio_cfg, 1);
+			gpio_tlmm_config(lcdc_gpio_config_data[i], GPIO_CFG_ENABLE);
 		}
 	} else {
 		for(i = 0; i < ARRAY_SIZE(lcdc_gpio_off_config_data); i++) {
-			gpio_tlmm_config(lcdc_gpio_off_config_data[i].gpio_cfg, 1);
+			gpio_tlmm_config(lcdc_gpio_off_config_data[i], GPIO_CFG_ENABLE);
 		}
 	}
 }
