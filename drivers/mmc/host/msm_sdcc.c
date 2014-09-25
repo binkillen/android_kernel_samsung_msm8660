@@ -6324,11 +6324,15 @@ static int msmsdcc_remove(struct platform_device *pdev)
 int msmsdcc_sdio_al_lpm(struct mmc_host *mmc, bool enable)
 {
 	struct msmsdcc_host *host = mmc_priv(mmc);
+#ifndef CONFIG_ARCH_MSM8X60
 	unsigned long flags;
+#endif
 	int rc = 0;
 
 	mutex_lock(&host->clk_mutex);
+#ifndef CONFIG_ARCH_MSM8X60
 	spin_lock_irqsave(&host->lock, flags);
+#endif
 	pr_debug("%s: %sabling LPM\n", mmc_hostname(mmc),
 			enable ? "En" : "Dis");
 
@@ -6344,9 +6348,13 @@ int msmsdcc_sdio_al_lpm(struct mmc_host *mmc, bool enable)
 
 		if (host->plat->sdio_lpm_gpio_setup &&
 				!host->sdio_gpio_lpm) {
+#ifndef CONFIG_ARCH_MSM8X60
 			spin_unlock_irqrestore(&host->lock, flags);
+#endif
 			host->plat->sdio_lpm_gpio_setup(mmc_dev(mmc), 0);
+#ifndef CONFIG_ARCH_MSM8X60
 			spin_lock_irqsave(&host->lock, flags);
+#endif
 			host->sdio_gpio_lpm = 1;
 		}
 
@@ -6368,9 +6376,13 @@ int msmsdcc_sdio_al_lpm(struct mmc_host *mmc, bool enable)
 
 		if (host->plat->sdio_lpm_gpio_setup &&
 				host->sdio_gpio_lpm) {
+#ifndef CONFIG_ARCH_MSM8X60
 			spin_unlock_irqrestore(&host->lock, flags);
+#endif
 			host->plat->sdio_lpm_gpio_setup(mmc_dev(mmc), 1);
+#ifndef CONFIG_ARCH_MSM8X60
 			spin_lock_irqsave(&host->lock, flags);
+#endif
 			host->sdio_gpio_lpm = 0;
 		}
 
@@ -6383,7 +6395,9 @@ int msmsdcc_sdio_al_lpm(struct mmc_host *mmc, bool enable)
 		}
 	}
 out:
+#ifndef CONFIG_ARCH_MSM8X60
 	spin_unlock_irqrestore(&host->lock, flags);
+#endif
 	mutex_unlock(&host->clk_mutex);
 	return rc;
 }
