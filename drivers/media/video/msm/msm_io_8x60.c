@@ -278,7 +278,6 @@ static void msm_camera_vreg_disable(void)
 	if (fs_vfe) {
 		regulator_disable(fs_vfe);
 		regulator_put(fs_vfe);
-		fs_vfe = NULL;
 	}
 }
 
@@ -369,7 +368,7 @@ int msm_camio_clk_enable(enum msm_camio_clk_type clktype)
 	}
 
 	if (!IS_ERR(clk))
-		clk_enable(clk);
+		clk_prepare_enable(clk);
 	else
 		rc = -1;
 	return rc;
