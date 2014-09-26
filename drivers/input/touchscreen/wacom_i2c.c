@@ -194,7 +194,7 @@ static void wacom_i2c_set_input_values(struct i2c_client *client,
 	input_dev->evbit[0] |= BIT_MASK(EV_KEY) | BIT_MASK(EV_ABS);
 
 	input_dev->evbit[0] |= BIT_MASK(EV_SW);
-	input_set_capability(input_dev, EV_SW, SW_PEN_INSERT);
+	input_set_capability(input_dev, EV_SW, 0x0f);
 
 	__set_bit(ABS_X, input_dev->absbit);
 	__set_bit(ABS_Y, input_dev->absbit);

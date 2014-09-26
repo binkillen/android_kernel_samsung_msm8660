@@ -23,6 +23,7 @@
 #include "mdp4_video_enhance.h"
 #include "smart_dimming.h"
 
+#include <linux/earlysuspend.h>
 #include <linux/gpio.h>
 
 #ifdef CONFIG_SAMSUNG_CMC624

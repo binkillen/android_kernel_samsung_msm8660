@@ -9839,7 +9839,7 @@ static struct platform_device *surf_devices[] __initdata = {
 #endif
 
 	&msm_tsens_device,
-	&msm_rpm_device,
+	&msm8660_rpm_device,
 #ifdef CONFIG_ION_MSM
 	&ion_dev,
 #endif
@@ -10022,7 +10022,6 @@ struct ion_platform_heap msm8x60_heaps [] = {
 			.extra_data = (void *)&co_ion_pdata,
 		},
 #endif
-	}
 };
 
 static struct ion_platform_data ion_pdata = {
@@ -10104,9 +10103,9 @@ static void __init reserve_ion_memory(void)
 			}
 		}
 	}
-#endif
-#endif
 	msm8x60_reserve_table[MEMTYPE_EBI1].size += msm_ion_sf_size;
+#endif
+#endif
 #ifndef CONFIG_SEC_KERNEL_REBASE_FOR_PMEM_OPTIMIZATION
 	msm8x60_reserve_table[MEMTYPE_EBI1].size += MSM_ION_CAMERA_SIZE;
 	msm8x60_reserve_table[MEMTYPE_EBI1].size += MSM_ION_WB_SIZE;
@@ -10177,6 +10176,7 @@ static void __init msm8x60_calculate_reserve_sizes(void)
 	reserve_pmem_memory();
 	reserve_ion_memory();
 	reserve_mdp_memory();
+	reserve_rtb_memory();
 }
 
 static int msm8x60_paddr_to_memtype(unsigned int paddr)
@@ -14772,7 +14772,7 @@ static int mipi_S6E8AA0_panel_power(int enable)
 }
 #endif /* CONFIG_FB_MSM_MIPI_S6E8AA0_HD720_PANEL || CONFIG_FB_MSM_MIPI_S6E8AA0_WXGA_Q1_PANEL */
 
-#if !defined(CONFIG_JPN_MODEL_SC_05D)
+#if 0 // !defined(CONFIG_JPN_MODEL_SC_05D)
  static int lcdc_LD9040_panel_power(int enable)
 {
 	static struct regulator *l3 = NULL;
@@ -14837,7 +14837,7 @@ static void lcdc_samsung_panel_power(int on)
 	int n, ret = 0;
 
 //	display_common_power(on);
-    lcdc_LD9040_panel_power(on);
+	lcdc_LD9040_panel_power(on);
 
 	for (n = 0; n < LCDC_NUM_GPIO; n++) {
 		if (on) {
@@ -14855,7 +14855,7 @@ static void lcdc_samsung_panel_power(int on)
 			gpio_free(LCDC_GPIO_START + n);
 	}
 
-	mipi_dsi_panel_power(0); /* set 8058_ldo0 to LPM */
+	mipi_dsi_panel_power(0); // set 8058_ldo0 to LPM
 }
 #endif
 
@@ -15066,10 +15066,12 @@ static int hdmi_panel_power(int on)
 
 
 #ifdef CONFIG_KEYPAD_CYPRESS_TOUCH
+#if 0
 static uint32_t Touch_Key_off_gpio_table[] = {
     GPIO_CFG(GPIO_TKEY_I2C_SCL,  GPIOMUX_FUNC_GPIO, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA),
     GPIO_CFG(GPIO_TKEY_I2C_SDA,  GPIOMUX_FUNC_GPIO, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA),
 };
+#endif
 
 struct regulator *TKEY_L12 = NULL;
 struct regulator *TKEY_L3B = NULL;

@@ -960,7 +960,7 @@ void mipi_dsi_host_init(struct mipi_panel_info *pinfo)
 
 #if defined(CONFIG_FB_MSM_MIPI_S6E8AA0_HD720_PANEL) \
 	|| defined(CONFIG_FB_MSM_MIPI_S6E8AA0_WXGA_Q1_PANEL)
-	/* add following line */.
+	/* add following line */
 	MIPI_OUTP(MIPI_DSI_BASE + 0xA8, 0x10000000);
 #endif
 
