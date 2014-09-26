@@ -18,6 +18,7 @@
 
 #include "msm_fb.h"
 #include "mipi_dsi.h"
+#include "mdp4.h"
 #include "mipi_s6e8aa0_hd720.h"
 
 static struct msm_panel_info pinfo;
@@ -142,9 +143,10 @@ static int __init mipi_video_s6e8aa0_hd720_pt_init(void)
 	pinfo.lcd.v_back_porch = pinfo.lcdc.v_back_porch;
 	pinfo.lcd.v_front_porch = pinfo.lcdc.v_front_porch;
 	pinfo.lcd.v_pulse_width = pinfo.lcdc.v_pulse_width;
+	pinfo.mipi.esc_byte_ratio = 1;
 
 	// for fix Screen Lockup
-	pinfo.lcd.blt_ctrl = BLT_SWITCH_TG_OFF; 	
+	pinfo.lcd.blt_ctrl = OVERLAY_BLT_SWITCH_TG_OFF;
 
 	ret = mipi_s6e8aa0_hd720_device_register(&pinfo, MIPI_DSI_PRIM,
 						MIPI_DSI_PANEL_WVGA_PT);
