@@ -45,6 +45,8 @@
 #define CHARM_MODEM_TIMEOUT	6000
 #define CHARM_HOLD_TIME		4000
 #define CHARM_MODEM_DELTA	100
+#define CHARM_BOOT_TIMEOUT	60000L
+#define CHARM_RDUMP_TIMEOUT	60000L
 
 static void (*power_on_charm)(void);
 static void (*power_down_charm)(void);
@@ -90,8 +92,13 @@ static int charm_subsys_powerup(const struct subsys_desc *crashed_subsys)
 	power_on_charm();
 	boot_type = CHARM_NORMAL_BOOT;
 	complete(&charm_needs_reload);
-	wait_for_completion(&charm_boot);
-	pr_info("%s: charm modem has been restarted\n", __func__);
+	if (!wait_for_completion_timeout(&charm_boot,
+			msecs_to_jiffies(CHARM_BOOT_TIMEOUT))) {
+		charm_boot_status = -ETIMEDOUT;
+		pr_info("%s: charm modem restart timed out.\n", __func__);
+	} else {
+		pr_info("%s: charm modem has been restarted\n", __func__);
+	}
 	INIT_COMPLETION(charm_boot);
 	return charm_boot_status;
 }
@@ -103,7 +110,13 @@ static int charm_subsys_ramdumps(int want_dumps,
 	if (want_dumps) {
 		boot_type = CHARM_RAM_DUMPS;
 		complete(&charm_needs_reload);
-		wait_for_completion(&charm_ram_dumps);
+		if (!wait_for_completion_timeout(&charm_boot,
+				msecs_to_jiffies(CHARM_RDUMP_TIMEOUT))) {
+			charm_ram_dump_status = -ETIMEDOUT;
+			pr_info("%s: charm modem ram dumps timed out.\n", __func__);
+		} else {
+			pr_info("%s: charm modem ram dumps completed\n", __func__);
+		}
 		INIT_COMPLETION(charm_ram_dumps);
 		power_down_charm();
 	}
