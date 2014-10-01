@@ -10009,6 +10009,11 @@ static struct reserve_info msm8x60_reserve_info __initdata = {
 	.paddr_to_memtype = msm8x60_paddr_to_memtype,
 };
 
+static void __init msm8x60_early_memory(void)
+{
+	reserve_info = &msm8x60_reserve_info;
+}
+
 static char prim_panel_name[PANEL_NAME_MAX_LEN];
 static char ext_panel_name[PANEL_NAME_MAX_LEN];
 static int __init prim_display_setup(char *param)
@@ -10030,7 +10035,6 @@ early_param("ext_display", ext_display_setup);
 static void __init msm8x60_reserve(void)
 {
 	msm8x60_set_display_params(prim_panel_name, ext_panel_name);
-	reserve_info = &msm8x60_reserve_info;
 	msm_reserve();
 
 #ifdef CONFIG_ANDROID_RAM_CONSOLE
@@ -16928,11 +16932,6 @@ static void __init msm8x60_charm_ffa_init(void)
 	msm8x60_init(&msm8x60_charm_ffa_board_data);
 }
 
-static void __init msm8x60_charm_init_early(void)
-{
-	msm8x60_allocate_memory_regions();
-}
-
 static void __init msm8x60_dragon_init(void)
 {
 	msm8x60_init(&msm8x60_dragon_board_data);
@@ -16945,7 +16944,8 @@ MACHINE_START(MSM8X60_SURF, "QCT MSM8X60 SURF")
 	.handle_irq = gic_handle_irq,
 	.init_machine = msm8x60_surf_init,
 	.timer = &msm_timer,
-	.init_early = msm8x60_charm_init_early,
+	.init_early = msm8x60_allocate_memory_regions,
+	.init_very_early = msm8x60_early_memory,
 	.restart = msm_restart,
 MACHINE_END
 
@@ -16956,7 +16956,8 @@ MACHINE_START(MSM8X60_FFA, "QCT MSM8X60 FFA")
 	.handle_irq = gic_handle_irq,
 	.init_machine = msm8x60_ffa_init,
 	.timer = &msm_timer,
-	.init_early = msm8x60_charm_init_early,
+	.init_early = msm8x60_allocate_memory_regions,
+	.init_very_early = msm8x60_early_memory,
 	.restart = msm_restart,
 MACHINE_END
 
@@ -16967,7 +16968,8 @@ MACHINE_START(MSM8X60_FLUID, "QCT MSM8X60 FLUID")
 	.handle_irq = gic_handle_irq,
 	.init_machine = msm8x60_fluid_init,
 	.timer = &msm_timer,
-	.init_early = msm8x60_charm_init_early,
+	.init_early = msm8x60_allocate_memory_regions,
+	.init_very_early = msm8x60_early_memory,
 	.restart = msm_restart,
 MACHINE_END
 
@@ -16978,7 +16980,8 @@ MACHINE_START(MSM8X60_FUSION, "QCT MSM8X60 FUSION SURF")
 	.handle_irq = gic_handle_irq,
 	.init_machine = msm8x60_charm_surf_init,
 	.timer = &msm_timer,
-	.init_early = msm8x60_charm_init_early,
+	.init_early = msm8x60_allocate_memory_regions,
+	.init_very_early = msm8x60_early_memory,
 	.restart = msm_restart,
 MACHINE_END
 
@@ -16989,7 +16992,8 @@ MACHINE_START(MSM8X60_FUSN_FFA, "QCT MSM8X60 FUSION FFA")
 	.handle_irq = gic_handle_irq,
 	.init_machine = msm8x60_charm_ffa_init,
 	.timer = &msm_timer,
-	.init_early = msm8x60_charm_init_early,
+	.init_early = msm8x60_allocate_memory_regions,
+	.init_very_early = msm8x60_early_memory,
 	.restart = msm_restart,
 MACHINE_END
 
@@ -17000,6 +17004,7 @@ MACHINE_START(MSM8X60_DRAGON, "QCT MSM8X60 DRAGON")
 	.handle_irq = gic_handle_irq,
 	.init_machine = msm8x60_dragon_init,
 	.timer = &msm_timer,
-	.init_early = msm8x60_charm_init_early,
+	.init_early = msm8x60_allocate_memory_regions,
+	.init_very_early = msm8x60_early_memory,
 	.restart = msm_restart,
 MACHINE_END
