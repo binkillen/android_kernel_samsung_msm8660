@@ -2903,6 +2903,18 @@ config MSM_USE_USER_ACCESSIBLE_TIMERS
 	  Enables MSM-specific user accessible timers via a shared
 	  memory page containing the cycle counter.
 
+config MSM_SDIO_INIT_WORKAROUND
+	bool "Delay modem SDIO detection"
+	default n
+	help
+	  Delay modem SDIO init by x seconds to prevent the
+	  modem from crashing the device when entering sleep.
+
+config MSM_SDIO_INIT_DELAY
+	int "Delay time in seconds: "
+	depends on MSM_SDIO_INIT_WORKAROUND
+	default 40
+
 endif
 
 config SEC_AUDIO_I2S_DRIVING_CURRENT
